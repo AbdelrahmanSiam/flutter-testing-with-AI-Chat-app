@@ -15,19 +15,13 @@ class ClientApi {
     String path, {
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
+    Map<String, dynamic>? headers,
   }) {
     return _dio.post<T>(
       path,
       data: data,
       queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
+      options: Options(headers: headers),
     );
   }
 
