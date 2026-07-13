@@ -1,60 +1,8 @@
-/// Represents a single part (usually text) within a message.
-class MessagePart {
-  final String text;
-  final String? thoughtSignature;
-
-  MessagePart({
-    required this.text,
-    this.thoughtSignature,
-  });
-
-  factory MessagePart.fromJson(Map<String, dynamic> json) {
-    return MessagePart(
-      text: json['text'] as String? ?? '',
-      thoughtSignature: json['thoughtSignature'] as String?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'text': text,
-      if (thoughtSignature != null) 'thoughtSignature': thoughtSignature,
-    };
-  }
-}
-
-/// Represents the content of a message containing multiple parts.
-class MessageContent {
-  final List<MessagePart> parts;
-  final String role; // "user" or "model"
-
-  MessageContent({
-    required this.parts,
-    required this.role,
-  });
-
-  factory MessageContent.fromJson(Map<String, dynamic> json) {
-    final partsList = (json['parts'] as List?)
-        ?.map((p) => MessagePart.fromJson(p as Map<String, dynamic>))
-        .toList() ?? [];
-
-    return MessageContent(
-      parts: partsList,
-      role: json['role'] as String? ?? 'user',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'parts': parts.map((p) => p.toJson()).toList(),
-      'role': role,
-    };
-  }
-}
+import 'package:ai_chat_app/models/message_content_model.dart';
 
 /// Represents a single chat message.
 class ChatMessageModel {
-  final MessageContent content;
+  final MessageContentModel content;
   final String? finishReason;
   final int? index;
 
@@ -66,7 +14,7 @@ class ChatMessageModel {
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
     return ChatMessageModel(
-      content: MessageContent.fromJson(json['content'] as Map<String, dynamic>),
+      content: MessageContentModel.fromJson(json['content'] as Map<String, dynamic>),
       finishReason: json['finishReason'] as String?,
       index: json['index'] as int?,
     );
