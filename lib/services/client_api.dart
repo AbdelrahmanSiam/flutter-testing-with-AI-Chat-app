@@ -2,11 +2,11 @@ import 'package:dio/dio.dart';
 
 class ClientApi {
   final Dio _dio;
+  final String _baseUrl;
 
-  ClientApi({
-    String baseUrl = '',
-    BaseOptions? options,
-  }) : _dio = Dio(options ?? BaseOptions(baseUrl: baseUrl));
+ ClientApi({Dio? dio, String? baseUrl})
+      : _dio = dio ?? Dio(),
+        _baseUrl = baseUrl ?? '';
 
   /// Sends a POST request to [path] with optional JSON [data].
   ///
@@ -17,8 +17,9 @@ class ClientApi {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) {
+    final url = _baseUrl.isEmpty ? path : '$_baseUrl$path';
     return _dio.post<T>(
-      path,
+      url,
       data: data,
       queryParameters: queryParameters,
       options: Options(headers: headers),
@@ -32,8 +33,9 @@ class ClientApi {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) {
+    final url = _baseUrl.isEmpty ? path : '$_baseUrl$path';
     return _dio.post<Map<String, dynamic>>(
-      path,
+      url,
       data: body,
       queryParameters: queryParameters,
       options: Options(
