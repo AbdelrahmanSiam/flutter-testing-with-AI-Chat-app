@@ -1,4 +1,5 @@
 import 'package:ai_chat_app/models/message_content_model.dart';
+import 'package:ai_chat_app/models/message_part_model.dart';
 
 /// Represents a single chat message.
 class ChatMessageModel {
@@ -6,17 +7,33 @@ class ChatMessageModel {
   final String? finishReason;
   final int? index;
 
-  ChatMessageModel({
-    required this.content,
-    this.finishReason,
-    this.index,
-  });
+  ChatMessageModel({required this.content, this.finishReason, this.index});
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
     return ChatMessageModel(
-      content: MessageContentModel.fromJson(json['content'] as Map<String, dynamic>),
+      content: MessageContentModel.fromJson(
+        json['content'] as Map<String, dynamic>,
+      ),
       finishReason: json['finishReason'] as String?,
       index: json['index'] as int?,
+    );
+  }
+
+  factory ChatMessageModel.user(String text) {
+    return ChatMessageModel(
+      content: MessageContentModel(
+        parts: [MessagePartModel(text: text)],
+        role: 'user',
+      ),
+    );
+  }
+
+  factory ChatMessageModel.model(String text) {
+    return ChatMessageModel(
+      content: MessageContentModel(
+        parts: [MessagePartModel(text: text)],
+        role: 'model',
+      ),
     );
   }
 
@@ -26,13 +43,5 @@ class ChatMessageModel {
       if (finishReason != null) 'finishReason': finishReason,
       if (index != null) 'index': index,
     };
-  }
-
-  /// Extracts the first text from the message's parts.
-  String get getText {
-    if (content.parts.isNotEmpty) {
-      return content.parts.first.text;
-    }
-    return '';
   }
 }
