@@ -8,4 +8,5 @@ abstract final class ChatColors {
   static const Color border = Color(0x4DC3C5D8);
   static const Color background = Color(0xFFFFFFFF);
   static const Color inputBackground = Color(0xFFF5F6FA);
+  static const Color appBarBackground = Color(0xFFF8F9FF);
 }

@@ -33,6 +33,20 @@ abstract final class ChatTextStyles {
         color: ChatColors.textSecondary,
       );
 
+  static TextStyle get appBarTitle => GoogleFonts.plusJakartaSans(
+        fontSize: 18,
+        height: 24 / 18,
+        fontWeight: FontWeight.w600,
+        color: ChatColors.textPrimary,
+      );
+
+  static TextStyle get appBarSubtitle => GoogleFonts.plusJakartaSans(
+        fontSize: 12,
+        height: 16 / 12,
+        fontWeight: FontWeight.w400,
+        color: ChatColors.textSecondary,
+      );
+
   static TextStyle get actionButton => GoogleFonts.plusJakartaSans(
         fontSize: 12,
         height: 16 / 12,
