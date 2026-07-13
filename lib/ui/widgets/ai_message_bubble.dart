@@ -20,7 +20,7 @@ class AiMessageBubble extends StatelessWidget {
 
   final String intro;
   final List<String> bodyParagraphs;
-  final String timestamp;
+  final DateTime timestamp;
   final bool showRegenerate;
   final VoidCallback? onCopy;
   final VoidCallback? onRegenerate;

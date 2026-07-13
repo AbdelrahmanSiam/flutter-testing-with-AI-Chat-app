@@ -12,7 +12,7 @@ class UserMessageBubble extends StatelessWidget {
   });
 
   final String message;
-  final String timestamp;
+  final DateTime timestamp;
 
   @override
   Widget build(BuildContext context) {

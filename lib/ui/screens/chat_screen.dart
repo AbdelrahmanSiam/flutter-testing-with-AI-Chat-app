@@ -12,6 +12,8 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+
     return Scaffold(
       backgroundColor: ChatColors.background,
       appBar: const ChatBotAppBar(
@@ -26,52 +28,49 @@ class ChatScreen extends StatelessWidget {
             icon: Icons.volume_up_outlined,
             tooltip: 'Speaker',
           ),
-          ChatBotAppBarAction(
-            icon: Icons.upload_outlined,
-            tooltip: 'Upload',
-          ),
+          ChatBotAppBarAction(icon: Icons.upload_outlined, tooltip: 'Upload'),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                children: const [
-                  UserMessageBubble(
-                    message:
-                        'Can you help me understand how machine learning models are trained ?',
-                    timestamp: '10:24 AM',
-                  ),
-                  SizedBox(height: 24),
-                  AiMessageBubble(
-                    intro:
-                        'Of course! Here is a clear overview of how ML models are trained:',
-                    bodyParagraphs: [
-                      'Training starts with collecting and cleaning data. ',
-                    ],
-                    timestamp: '10:25 AM',
-                  ),
-                  SizedBox(height: 24),
-                  UserMessageBubble(
-                    message:
-                        'That makes sense. What about overfitting and how do we prevent it?',
-                    timestamp: '10:26 AM',
-                  ),
-                  SizedBox(height: 24),
-                  AiMessageBubble(
-                    intro: 'Great follow-up question.',
-                    bodyParagraphs: [
-                      'Overfitting happens when a model memorizes training data instead of learning general patterns.',
-                    ],
-                    timestamp: '10:26 AM',
-                    showRegenerate: false,
-                  ),
-                  SizedBox(height: 24),
-                  UserMessageBubble(message: 'Thanks!', timestamp: '10:27 AM'),
-                ],
-              ),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              children: [
+                UserMessageBubble(
+                  message:
+                      'Can you help me understand how machine learning models are trained ?',
+                  timestamp: now.subtract(const Duration(minutes: 3)),
+                ),
+                const SizedBox(height: 24),
+                AiMessageBubble(
+                  intro:
+                      'Of course! Here is a clear overview of how ML models are trained:',
+                  bodyParagraphs: const [
+                    'Training starts with collecting and cleaning data. ',
+                  ],
+                  timestamp: now.subtract(const Duration(minutes: 2)),
+                ),
+                const SizedBox(height: 24),
+                UserMessageBubble(
+                  message:
+                      'That makes sense. What about overfitting and how do we prevent it?',
+                  timestamp: now.subtract(const Duration(minutes: 1)),
+                ),
+                const SizedBox(height: 24),
+                AiMessageBubble(
+                  intro: 'Great follow-up question.',
+                  bodyParagraphs: const [
+                    'Overfitting happens when a model memorizes training data instead of learning general patterns.',
+                  ],
+                  timestamp: now,
+                  showRegenerate: false,
+                ),
+                const SizedBox(height: 24),
+                UserMessageBubble(message: 'Thanks!', timestamp: now),
+              ],
             ),
+          ),
           const ChatInputBar(),
         ],
       ),

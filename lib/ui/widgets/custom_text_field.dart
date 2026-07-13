@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/chat_colors.dart';
+import '../theme/chat_text_styles.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
@@ -41,18 +41,10 @@ class CustomTextField extends StatelessWidget {
         maxLines: maxLines,
         onChanged: onChanged,
         onSubmitted: onSubmitted,
-        style: GoogleFonts.plusJakartaSans(
-          fontSize: 15,
-          height: 22 / 15,
-          fontWeight: FontWeight.w400,
-          color: ChatColors.textPrimary,
-        ),
+        style: ChatTextStyles.inputField,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 15,
-            height: 22 / 15,
-            fontWeight: FontWeight.w400,
+          hintStyle: ChatTextStyles.inputField.copyWith(
             color: ChatColors.textSecondary.withValues(alpha: 0.6),
           ),
           border: InputBorder.none,

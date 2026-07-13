@@ -54,4 +54,11 @@ abstract final class ChatTextStyles {
         letterSpacing: 0.6,
         color: ChatColors.primary,
       );
+
+  static TextStyle get inputField => GoogleFonts.plusJakartaSans(
+        fontSize: 15,
+        height: 22 / 15,
+        fontWeight: FontWeight.w400,
+        color: ChatColors.textPrimary,
+      );
 }

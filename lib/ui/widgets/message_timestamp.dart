@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/chat_text_styles.dart';
+import '../utils/message_time_formatter.dart';
 
 class MessageTimestamp extends StatelessWidget {
   const MessageTimestamp({
@@ -10,7 +11,7 @@ class MessageTimestamp extends StatelessWidget {
     this.padding = const EdgeInsets.only(top: 4, right: 8),
   });
 
-  final String time;
+  final DateTime time;
   final Alignment align;
   final EdgeInsets padding;
 
@@ -20,7 +21,10 @@ class MessageTimestamp extends StatelessWidget {
       alignment: align,
       child: Padding(
         padding: padding,
-        child: Text(time, style: ChatTextStyles.timestamp),
+        child: Text(
+          MessageTimeFormatter.format(time),
+          style: ChatTextStyles.timestamp,
+        ),
       ),
     );
   }
