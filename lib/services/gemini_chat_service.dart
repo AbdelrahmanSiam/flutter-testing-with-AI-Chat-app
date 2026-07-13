@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 import '../models/chat_message_model.dart';
 import 'client_api.dart';
 
