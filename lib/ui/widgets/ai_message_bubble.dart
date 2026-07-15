@@ -76,26 +76,6 @@ class AiMessageBubble extends StatelessWidget {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 4, left: 40),
-          child: Row(
-            children: [
-              MessageActionButton(
-                label: 'Copy',
-                icon: Icons.copy_outlined,
-                onTap: onCopy,
-              ),
-              if (showRegenerate) ...[
-                const SizedBox(width: 8),
-                MessageActionButton(
-                  label: 'Regenerate',
-                  icon: Icons.refresh,
-                  onTap: onRegenerate,
-                ),
-              ],
-            ],
-          ),
-        ),
         MessageTimestamp(
           time: DateTime.now(),
           align: Alignment.centerLeft,
