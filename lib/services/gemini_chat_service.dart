@@ -1,39 +1,55 @@
-import '../models/chat_message_model.dart';
+import 'package:ai_chat_app/models/chat_message_model.dart';
+import 'package:ai_chat_app/models/message_content_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'client_api.dart';
 
 /// Service for interacting with Google Gemini API.
 class GeminiChatService {
   final ClientApi _api;
-  final String _apiKey;
-  final String _modelId;
+  final String _apiKey = dotenv.env["API_KEY"]!;
 
   GeminiChatService({
     required ClientApi api,
-    required String apiKey,
-    String modelId = 'gemini-3-flash-preview',
-  }) : _api = api,
-       _apiKey = apiKey,
-       _modelId = modelId;
+    String modelId = 'gemini-3-flash-preview',   // Recommended model
+  })  : _api = api;
 
-  /// Sends a list of chat messages to Gemini and returns the model's response.
-  ///
-  /// Takes [messages] as a list of chat messages (user and model turns).
-  /// Returns a [ChatMessageModel] containing the model's response.
   Future<ChatMessageModel> sendMessage(List<ChatMessageModel> messages) async {
-    // Format messages for the API request
     final requestContents = messages
-        .map((message) => message.toJson())
+        .map((message) => {
+              'role': message.content.role,
+              'parts': message.content.parts.map((p) => p.toJson()).toList(),
+            })
         .toList();
 
-    final url = '/v1beta/models/$_modelId:generateContent';
+    final url = dotenv.env["API_URL"]!;
 
-    // Make the POST request
     final response = await _api.post<Map<String, dynamic>>(
       url,
       data: {'contents': requestContents},
-      headers: {'x-goog-api-key': _apiKey, 'Content-Type': 'application/json'},
+      headers: {
+        'x-goog-api-key': _apiKey,
+        'Content-Type': 'application/json',
+      },
     );
 
-    return ChatMessageModel.fromJson(response.data!);
+    final data = response.data;
+
+    if (data == null || data['candidates'] == null || (data['candidates'] as List).isEmpty) {
+      throw Exception('No response from Gemini API');
+    }
+
+    final candidate = (data['candidates'] as List).first as Map<String, dynamic>;
+    final content = candidate['content'] as Map<String, dynamic>?;
+
+    if (content == null) {
+      throw Exception('Invalid response format from Gemini');
+    }
+
+    // Convert to your model
+    return ChatMessageModel(
+      content: MessageContentModel.fromJson(content),
+      finishReason: candidate['finishReason'] as String?,
+      index: candidate['index'] as int?,
+    );
   }
 }

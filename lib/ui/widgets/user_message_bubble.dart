@@ -8,11 +8,11 @@ class UserMessageBubble extends StatelessWidget {
   const UserMessageBubble({
     super.key,
     required this.message,
-    required this.timestamp,
+   this.timestamp ,
   });
 
   final String message;
-  final DateTime timestamp;
+  final DateTime ? timestamp;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class UserMessageBubble extends StatelessWidget {
             ),
           ),
         ),
-        MessageTimestamp(time: timestamp),
+        MessageTimestamp(time: DateTime.now()),
       ],
     );
   }

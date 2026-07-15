@@ -1,19 +1,43 @@
+import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
+import 'package:ai_chat_app/models/chat_message_model.dart';
+import 'package:ai_chat_app/ui/widgets/send_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../theme/chat_colors.dart';
 import 'custom_text_field.dart';
 
-class ChatInputBar extends StatelessWidget {
+class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
     super.key,
     this.controller,
     this.hintText = 'Ask anything...',
-    this.onSend,
+    required this.messages,
   });
 
   final TextEditingController? controller;
   final String hintText;
-  final VoidCallback? onSend;
+  final List<ChatMessageModel> messages;
+
+  @override
+  State<ChatInputBar> createState() => _ChatInputBarState();
+}
+
+class _ChatInputBarState extends State<ChatInputBar> {
+  late final TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = widget.controller ?? TextEditingController();
+  }
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      controller.dispose(); // Only dispose if we created it
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,21 +51,22 @@ class ChatInputBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            child: CustomTextField(controller: controller, hintText: hintText),
+            child: CustomTextField(
+              controller: controller,
+              hintText: widget.hintText,
+            ),
           ),
           const SizedBox(width: 12),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: ChatColors.primary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              onPressed: onSend,
-              icon: const Icon(
-                Icons.arrow_upward_rounded,
-                color: ChatColors.userBubbleText,
-              ),
-            ),
+          SendButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+              widget.messages.add(ChatMessageModel.user(text));
+              controller.clear();
+              context.read<GeminiSendMessageCubit>().sendMessage(
+                widget.messages,
+              );
+            },
           ),
         ],
       ),

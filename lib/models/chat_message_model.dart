@@ -37,6 +37,12 @@ class ChatMessageModel {
     );
   }
 
+  /// Returns true if this message was sent by the user
+  bool get isUser => content.role == 'user';
+
+  /// Returns true if this message was sent by the AI (Gemini)
+  bool get isModel => content.role == 'model';
+
   Map<String, dynamic> toJson() {
     return {
       'content': content.toJson(),

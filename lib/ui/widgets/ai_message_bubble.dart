@@ -11,7 +11,7 @@ class AiMessageBubble extends StatelessWidget {
     super.key,
     required this.intro,
     required this.bodyParagraphs,
-    required this.timestamp,
+    this.timestamp,
     this.showRegenerate = true,
     this.onCopy,
     this.onRegenerate,
@@ -20,7 +20,7 @@ class AiMessageBubble extends StatelessWidget {
 
   final String intro;
   final List<String> bodyParagraphs;
-  final DateTime timestamp;
+  final DateTime? timestamp;
   final bool showRegenerate;
   final VoidCallback? onCopy;
   final VoidCallback? onRegenerate;
@@ -97,7 +97,7 @@ class AiMessageBubble extends StatelessWidget {
           ),
         ),
         MessageTimestamp(
-          time: timestamp,
+          time: DateTime.now(),
           align: Alignment.centerLeft,
           padding: const EdgeInsets.only(top: 4, left: 40),
         ),
