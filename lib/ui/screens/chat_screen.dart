@@ -2,6 +2,7 @@ import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.
 import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_state.dart';
 import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/ui/widgets/chat_messages_list.dart';
+import 'package:ai_chat_app/ui/widgets/failure_chat_messages_list.dart';
 import 'package:ai_chat_app/ui/widgets/loading_chat_messages_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,8 +52,17 @@ class ChatScreen extends StatelessWidget {
                 }
               },
               builder: (context, state) {
-                if(state is GeminiSendMessageLoading) {
+                if (state is GeminiSendMessageLoading) {
                   return LoadingChatMessagesList(messages: messages);
+                }
+                if (state is GeminiSendMessageFailure) {
+                  return FailureChatMessagesList(
+                    messages: messages,
+                    errorMessage: state.error,
+                    onRetry: () {
+                      context.read<GeminiSendMessageCubit>().sendMessage(messages);
+                    },
+                  );
                 }
                 return ChatMessagesList(now: now, messages: messages);
               },
