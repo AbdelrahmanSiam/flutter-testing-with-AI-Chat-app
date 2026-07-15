@@ -34,6 +34,20 @@ class ChatMessagesList extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
           itemCount: isLoading ? messages.length + 1 : messages.length,
           itemBuilder: (context, index) {
+            if (isLoading && index == messages.length) {
+              return const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 24),
+                  child: AiLoadingMessageBubble(),
+                ),
+              );
+            }
+
+            if (index >= messages.length) {
+              return const SizedBox.shrink();
+            }
+
             final message = messages[index];
             final isUser = message.isUser;
             final parts = message.content.parts;
@@ -41,15 +55,6 @@ class ChatMessagesList extends StatelessWidget {
             final bodyParagraphs = parts.length > 1
                 ? parts.skip(1).map((part) => part.text).toList()
                 : <String>[];
-            if (index == messages.length && isLoading) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: const AiLoadingMessageBubble(),
-                ),
-              );
-            }
             return Align(
               alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
               child: Padding(
