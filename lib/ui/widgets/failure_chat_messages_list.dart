@@ -18,23 +18,25 @@ class FailureChatMessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      reverse: true,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
       itemCount: messages.length ,
       itemBuilder: (context, index) {
-        if (index == messages.length - 1) {
+        if (index == 0) {
           return Align(
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: FailureMessageBubble(
-                message: errorMessage,
+                message: messages[messages.length - 1].content.parts.first.text,
                 onRetry: onRetry,
               ),
             ),
           );
         }
 
-        final message = messages[index];
+        var newIndex = messages.length - (index + 1);
+        final message = messages[newIndex];
         final isUser = message.isUser;
         final parts = message.content.parts;
         final intro = parts.isNotEmpty ? parts.first.text : '';

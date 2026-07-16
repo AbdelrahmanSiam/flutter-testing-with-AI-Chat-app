@@ -1,4 +1,5 @@
 import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
+import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_state.dart';
 import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/ui/widgets/send_button.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
             onPressed: () {
               final text = controller.text.trim();
               if (text.isEmpty) return;
+              if(context.read<GeminiSendMessageCubit>().state is GeminiSendMessageFailure) {
+                widget.messages.removeLast();
+              }
               widget.messages.add(ChatMessageModel.user(text));
               controller.clear();
               context.read<GeminiSendMessageCubit>().sendMessage(

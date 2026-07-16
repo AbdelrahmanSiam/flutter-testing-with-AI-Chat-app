@@ -16,10 +16,12 @@ class ChatMessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      reverse: true,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
       itemCount: messages.length,
       itemBuilder: (context, index) {
-        final message = messages[index];
+        var newIndex = messages.length - (index + 1);
+        final message = messages[newIndex];
         final isUser = message.isUser;
         final parts = message.content.parts;
         final intro = parts.isNotEmpty ? parts.first.text : '';
