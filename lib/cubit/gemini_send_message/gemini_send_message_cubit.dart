@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../models/chat_message_model.dart';
-import '../../repositories/gemini_send_message_repository.dart';
+import '../../data/repositories/gemini_send_message_repository.dart';
 import 'gemini_send_message_state.dart';
 
 class GeminiSendMessageCubit extends Cubit<GeminiSendMessageState> {

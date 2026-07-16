@@ -1,5 +1,5 @@
-import '../models/chat_message_model.dart';
-import '../services/gemini_chat_service.dart';
+import '../../models/chat_message_model.dart';
+import '../../services/gemini_chat_service.dart';
 import 'gemini_send_message_repository.dart';
 
 /// Concrete repository implementation for Gemini message sending.
