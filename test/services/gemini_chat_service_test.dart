@@ -46,6 +46,10 @@ void main() {
     },
     requestOptions: RequestOptions(path: '/'),
   );
+  DioException retryableDioException() => DioException(
+        requestOptions: RequestOptions(path: '/'),
+        type: DioExceptionType.connectionTimeout,
+      );
 
   group("Test Retry Logic", () {
     setUpAll(() async {
@@ -61,7 +65,6 @@ void main() {
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => successResponse);
-
       // Act
       final res = await service.sendMessage([]);
       // Assert
@@ -73,11 +76,43 @@ void main() {
           headers: any(named: "headers"),
         ),
       ).called(1); // Ensure only one call was made and successful
-
       /* Or
        var callCount = verify(() => mock.post(any(), data: any(named: "data"), headers: any(named: "headers"))).callCount;
        expect(callCount, equals(1));
        */
+      expect(res, isA<ChatMessageModel>());
+    });
+
+    test("Test Api Request fails at first attempt then succeeds", () async {
+      int counter = 0;
+      // Arrange
+      when(
+        () => mock.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: "data"),
+          queryParameters: any(named: "queryParameters"),
+          headers: any(named: "headers"),
+        ),
+      ).thenAnswer((_) async {
+        counter++;
+        if (counter == 1) {
+          throw retryableDioException();
+        }
+        return successResponse;
+      });
+      // Act
+      final res = await service.sendMessage([]);
+      // Assert
+      verify(
+        () => mock.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: "data"),
+          queryParameters: any(named: "queryParameters"),
+          headers: any(named: "headers"),
+        ),
+      ).called(
+        2,
+      ); // Ensure there two attempts to get the request and the second one was successful
       expect(res, isA<ChatMessageModel>());
     });
   });
