@@ -36,7 +36,7 @@ class GeminiChatService {
           },
         );
         final data = response.data;
-        return ChatMessageModel.fromJson(data!);
+        return ChatMessageModel.fromJson(_extractResponseCandidate(data!));
       } on DioException catch (e) {
         exception = e;
         if (!isRetryableDioException(e)) {
@@ -48,6 +48,18 @@ class GeminiChatService {
       }
     }
     throw exception;
+  }
+
+  Map<String, dynamic> _extractResponseCandidate(Map<String, dynamic> data) {
+    final candidates = data['candidates'];
+    if (candidates is List && candidates.isNotEmpty) {
+      final firstCandidate = candidates.first;
+      if (firstCandidate is Map<String, dynamic>) {
+        return firstCandidate;
+      }
+    }
+
+    return data;
   }
 
   bool isRetryableDioException(DioException exception) {

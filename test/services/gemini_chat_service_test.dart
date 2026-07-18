@@ -2,6 +2,7 @@ import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/services/client_api.dart';
 import 'package:ai_chat_app/services/gemini_chat_service.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -18,25 +19,45 @@ void main() {
 
   final successResponse = Response<Map<String, dynamic>>(
     data: {
-      'content': {
-        'role': 'model',
-        'parts': [
-          {'text': 'Hello from Gemini'},
+      'candidates': [
+        {
+          'content': {
+            'parts': [
+              {'text': 'Hello from Gemini'},
+            ],
+            'role': 'model',
+          },
+          'finishReason': 'STOP',
+          'index': 0,
+        },
+      ],
+      'usageMetadata': {
+        'promptTokenCount': 5,
+        'candidatesTokenCount': 843,
+        'totalTokenCount': 1372,
+        'promptTokensDetails': [
+          {'modality': 'TEXT', 'tokenCount': 5},
         ],
+        'thoughtsTokenCount': 524,
+        'serviceTier': 'standard',
       },
-      'finishReason': 'stop',
-      'index': 0,
+      'modelVersion': 'gemini-3-flash-preview',
+      'responseId': 'SH1barH0CqyzvdIP94ePuQE',
     },
     requestOptions: RequestOptions(path: '/'),
   );
 
   group("Test Retry Logic", () {
+    setUpAll(() async {
+      await dotenv.load(fileName: '.env');
+    });
     test("Test Api Request success from first attempt", () async {
       // Arrange
       when(
-        () => mock.post(
+        () => mock.post<Map<String, dynamic>>(
           any(),
           data: any(named: "data"),
+          queryParameters: any(named: "queryParameters"),
           headers: any(named: "headers"),
         ),
       ).thenAnswer((_) async => successResponse);
@@ -45,9 +66,10 @@ void main() {
       final res = await service.sendMessage([]);
       // Assert
       verify(
-        () => mock.post(
+        () => mock.post<Map<String, dynamic>>(
           any(),
           data: any(named: "data"),
+          queryParameters: any(named: "queryParameters"),
           headers: any(named: "headers"),
         ),
       ).called(1); // Ensure only one call was made and successful
@@ -58,6 +80,5 @@ void main() {
        */
       expect(res, isA<ChatMessageModel>());
     });
-
   });
 }
