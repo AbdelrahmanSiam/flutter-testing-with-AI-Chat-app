@@ -122,7 +122,41 @@ void main() {
       ); // Ensure there two attempts to get the request and the second one was successful
       expect(res, isA<ChatMessageModel>());
     });
-
+    test(
+      "Test Api Request fails at first and second attempt then succeeds",
+      () async {
+        int counter = 0;
+        // Arrange
+        when(
+          () => mock.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: "data"),
+            queryParameters: any(named: "queryParameters"),
+            headers: any(named: "headers"),
+          ),
+        ).thenAnswer((_) async {
+          counter++;
+          if (counter == 3) {
+            return successResponse;
+          }
+          throw retryableDioException();
+        });
+        // Act
+        final res = await service.sendMessage([]);
+        // Assert
+        verify(
+          () => mock.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: "data"),
+            queryParameters: any(named: "queryParameters"),
+            headers: any(named: "headers"),
+          ),
+        ).called(
+          3,
+        ); // Ensure there three attempts to get the request and the third one was successful
+        expect(res, isA<ChatMessageModel>());
+      },
+    );
     test(
       "Test Api Request fails at first attempt and throw non retryable exception",
       () async {
@@ -163,7 +197,9 @@ void main() {
             queryParameters: any(named: "queryParameters"),
             headers: any(named: "headers"),
           ),
-        ).called(3); // Ensure there three attempts to get the request and all of them failed
+        ).called(
+          3,
+        ); // Ensure there three attempts to get the request and all of them failed
       },
     );
   });
