@@ -63,7 +63,7 @@ void main() {
           role: 'model',
           parts: [MessagePartModel(text: 'text')],
         ),
-      ));
+      ),);
       var res = await repo.geminiSendMessage(messages);
       var capturedMessages = verify(() => mock.sendMessage(captureAny<List<ChatMessageModel>>()),).captured.first as List<ChatMessageModel>;
       // Assert

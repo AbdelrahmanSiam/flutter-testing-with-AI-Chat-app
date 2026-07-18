@@ -1,5 +1,4 @@
 import 'package:ai_chat_app/models/chat_message_model.dart';
-import 'package:ai_chat_app/models/message_content_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'client_api.dart';
@@ -11,7 +10,7 @@ class GeminiChatService {
 
   GeminiChatService({
     required ClientApi api,
-    String modelId = 'gemini-3-flash-preview', // Recommended model
+    String modelId = 'gemini-3-flash-preview',
   }) : _api = api;
   final url = dotenv.env["API_URL"]!;
 
