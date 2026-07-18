@@ -47,17 +47,17 @@ void main() {
     requestOptions: RequestOptions(path: '/'),
   );
   DioException retryableDioException() => DioException(
-        requestOptions: RequestOptions(path: '/'),
-        type: DioExceptionType.connectionTimeout,
-      );
+    requestOptions: RequestOptions(path: '/'),
+    type: DioExceptionType.connectionTimeout,
+  );
   DioException notRetryableDioException() => DioException(
-        requestOptions: RequestOptions(path: '/' ),
-        response: Response(
-          requestOptions: RequestOptions(path: '/'),
-          statusCode: 400,
-          data: {'error': 'Bad Request'},
-        ),
-      );
+    requestOptions: RequestOptions(path: '/'),
+    response: Response(
+      requestOptions: RequestOptions(path: '/'),
+      statusCode: 400,
+      data: {'error': 'Bad Request'},
+    ),
+  );
   group("Test Retry Logic", () {
     setUpAll(() async {
       await dotenv.load(fileName: '.env');
@@ -122,17 +122,49 @@ void main() {
       ); // Ensure there two attempts to get the request and the second one was successful
       expect(res, isA<ChatMessageModel>());
     });
-    
-    test("Test Api Request fails at first attempt and throw non retryable exception", () async {
-      when(
-        () => mock.post<Map<String, dynamic>>(
-          any(),
-          data: any(named: "data"),
-          queryParameters: any(named: "queryParameters"),
-          headers: any(named: "headers"),
-        ),
-      ).thenAnswer((_) async => throw notRetryableDioException());
-      await expectLater(()=> service.sendMessage([]) , throwsA(isA<DioException>()));
-    });
+
+    test(
+      "Test Api Request fails at first attempt and throw non retryable exception",
+      () async {
+        when(
+          () => mock.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: "data"),
+            queryParameters: any(named: "queryParameters"),
+            headers: any(named: "headers"),
+          ),
+        ).thenAnswer((_) async => throw notRetryableDioException());
+        await expectLater(
+          () => service.sendMessage([]),
+          throwsA(isA<DioException>()),
+        );
+      },
+    );
+
+    test(
+      "Test Api Request fails at 3 attempt and throw non retryable exception",
+      () async {
+        when(
+          () => mock.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: "data"),
+            queryParameters: any(named: "queryParameters"),
+            headers: any(named: "headers"),
+          ),
+        ).thenAnswer((_) async => throw notRetryableDioException());
+        await expectLater(
+          () => service.sendMessage([]),
+          throwsA(isA<DioException>()),
+        );
+        verify(
+          () => mock.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: "data"),
+            queryParameters: any(named: "queryParameters"),
+            headers: any(named: "headers"),
+          ),
+        ).called(3); // Ensure there three attempts to get the request and all of them failed
+      },
+    );
   });
 }
