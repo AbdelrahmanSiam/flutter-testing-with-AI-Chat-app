@@ -21,14 +21,14 @@ void main() {
   late GeminiChatServiceMock mock;
 
   setUp(() {
-    repo = GeminiSendMessageRepositoryImpl(service: GeminiChatServiceMock());
     mock = GeminiChatServiceMock();
+    repo = GeminiSendMessageRepositoryImpl(service: mock);
   });
 
   group('Test that validation in send message is correct', () {
     test(
       'Test if messages length > 20 then messages length does not change',
-      () {
+      () async {
         // Arrange
         when(
           () => mock.sendMessage(any()),
@@ -43,7 +43,7 @@ void main() {
             ),
           ),
         );
-        var res = repo.geminiSendMessage(messages);
+        var res = await repo.geminiSendMessage(messages);
         var capturedMessages =
             verify(
                   () => mock.sendMessage(captureAny<List<ChatMessageModel>>()),
@@ -53,5 +53,20 @@ void main() {
         expect(capturedMessages.length, equals(messages.length));
       },
     );
+    test("Test if messages length > 20 then messages length is 5" , () async{
+      // Arragne
+      when(() => mock.sendMessage(any())).thenAnswer((_)async => _getMessageModelTest());
+      // Act
+      List<ChatMessageModel> messages = List.generate(5 , (index)=> ChatMessageModel(
+        content: MessageContentModel(
+          role: 'model',
+          parts: [MessagePartModel(text: 'text')],
+        ),
+      ));
+      var res = await repo.geminiSendMessage(messages);
+      var capturedMessages = verify(() => mock.sendMessage(captureAny<List<ChatMessageModel>>()),).captured.first as List<ChatMessageModel>;
+      // Assert
+      expect(capturedMessages.length, equals(messages.length));
+    });
   });
 }
