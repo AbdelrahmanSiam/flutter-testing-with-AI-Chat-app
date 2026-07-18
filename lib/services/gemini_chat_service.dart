@@ -67,6 +67,7 @@ class GeminiChatService {
         if (statusCode == null) {
           return true;
         }
+        // 429 Too Many Requests, 408 Request Timeout, 5xx Server Errors
         return statusCode == 429 ||
             statusCode == 408 ||
             (statusCode >= 500 && statusCode < 600);
@@ -77,3 +78,14 @@ class GeminiChatService {
     }
   }
 }
+
+/*
+1/ Determine logic and write it
+2/ Mock you Api Client class
+3/ Write test cases for the logic you wrote:
+  3.1 Test success from first attempt
+  3.2 Test failed at first attempt , but success at second attempt => using retryable exception
+  3.3 Test failed at first and can not be retried => non retryable exception
+  3.4 Test failed at second attempt , but success at third attempt => using retryable exception
+  3.5 Test failed at all three attempts
+*/ 
