@@ -57,7 +57,8 @@ void main() {
       // Arragne
       when(() => mock.sendMessage(any())).thenAnswer((_)async => _getMessageModelTest());
       // Act
-      List<ChatMessageModel> messages = List.generate(5 , (index)=> ChatMessageModel(
+      // Create a list with number more than 20 messages
+      List<ChatMessageModel> messages = List.generate(25 , (index)=> ChatMessageModel(
         content: MessageContentModel(
           role: 'model',
           parts: [MessagePartModel(text: 'text')],
@@ -66,7 +67,7 @@ void main() {
       var res = await repo.geminiSendMessage(messages);
       var capturedMessages = verify(() => mock.sendMessage(captureAny<List<ChatMessageModel>>()),).captured.first as List<ChatMessageModel>;
       // Assert
-      expect(capturedMessages.length, equals(messages.length));
+      expect(capturedMessages.length, equals(5));
     });
   });
 }
