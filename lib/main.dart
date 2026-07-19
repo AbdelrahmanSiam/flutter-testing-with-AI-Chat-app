@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'ui/screens/chat_screen.dart';
 
-void main()async {
+void main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
@@ -24,18 +24,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
-      home: BlocProvider(
-        create: (_) => GeminiSendMessageCubit(
-          repository: GeminiSendMessageRepositoryImpl(
-            service: GeminiChatService(
-              api: ClientApi(
-                baseUrl: 'https://generativelanguage.googleapis.com',
-              ),
-            ),
-          ),
-        ),
-        child: const ChatScreen(),
-      ),
+      home: const ChatScreen(),
     );
   }
 }
