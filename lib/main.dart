@@ -1,13 +1,10 @@
-import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
-import 'package:ai_chat_app/data/repositories/gemini_send_message_repository_impl.dart';
-import 'package:ai_chat_app/services/client_api.dart';
-import 'package:ai_chat_app/services/gemini_chat_service.dart';
+import 'package:ai_chat_app/di/service_locator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'ui/screens/chat_screen.dart';
 
 void main() async {
+ setupServiceLocator();
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
