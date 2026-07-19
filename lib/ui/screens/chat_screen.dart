@@ -1,6 +1,7 @@
 import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
 import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_state.dart';
 import 'package:ai_chat_app/data/repositories/gemini_send_message_repository_impl.dart';
+import 'package:ai_chat_app/di/service_locator.dart';
 import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/services/client_api.dart';
 import 'package:ai_chat_app/services/gemini_chat_service.dart';
@@ -24,15 +25,7 @@ class ChatScreen extends StatelessWidget {
     final List<ChatMessageModel> messages = [];
 
     return BlocProvider(
-      create: (context) => GeminiSendMessageCubit(
-        repository: GeminiSendMessageRepositoryImpl(
-          service: GeminiChatService(
-            api: ClientApi(
-              baseUrl: 'https://generativelanguage.googleapis.com',
-            ),
-          ),
-        ),
-      ),
+      create: (context) => getIt<GeminiSendMessageCubit>(),
       child: Scaffold(
         backgroundColor: ChatColors.background,
         appBar: const ChatBotAppBar(

@@ -4,8 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'ui/screens/chat_screen.dart';
 
 void main() async {
- setupServiceLocator();
   await dotenv.load(fileName: ".env");
+  setupServiceLocator();
   runApp(const MyApp());
 }
 

@@ -4,24 +4,67 @@ Test cases:
 // Initial state: no messages shown   => Ignored because it is available in cubit state
 // validation of input message as Unit test (If i have input validation logic)
 
-When the user sends a message, expect a loading bubble to appear.
-When the user sends a message and the request succeeds, expect a success bubble to appear.
-When the user sends a message and the request fails, expect a failure bubble to appear.
-When a failure bubble is shown and the user taps retry, expect a loading bubble to appear and then either:
+case 1 : When the user sends a message, expect a loading bubble to appear.
+case 2 : When the user sends a message and the request succeeds, expect a success bubble to appear.
+case 3 : When the user sends a message and the request fails, expect a failure bubble to appear.
+case 4 : When a failure bubble is shown and the user taps retry, expect a loading bubble to appear and then either:
 a success bubble if the retry succeeds, or
 a failure bubble if the retry fails.
-When a failure bubble is shown and the user sends another message, expect the new message to be accepted and processed.
+case 5 : When a failure bubble is shown and the user sends another message, expect the new message to be accepted and processed.
 When a loading bubble is visible, expect the user to be unable to send another message.
  */
+import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
+import 'package:ai_chat_app/data/repositories/gemini_send_message_repository.dart';
 import 'package:ai_chat_app/data/repositories/gemini_send_message_repository_impl.dart';
+import 'package:ai_chat_app/di/service_locator.dart';
+import 'package:ai_chat_app/models/chat_message_model.dart';
+import 'package:ai_chat_app/ui/screens/chat_screen.dart';
+import 'package:ai_chat_app/ui/widgets/ai_loading_message_bubble.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class GeminiSendMessageRepositoryImplMock extends Mock implements GeminiSendMessageRepositoryImpl {}
+class GeminiSendMessageRepositoryImplMock extends Mock
+    implements GeminiSendMessageRepositoryImpl {}
+
+ChatMessageModel getChatMessageModel() =>
+    ChatMessageModel.model('Hello, how can I assist you today?');
 
 void main() {
   late GeminiSendMessageRepositoryImplMock mock;
-  setUp(() {
+  setUp(() async {
     mock = GeminiSendMessageRepositoryImplMock();
+    await getIt
+        .reset(); // To ensure that the service locator is reset before each test and generate a new instance of the cubit with the mock repository.
+    getIt.registerSingleton<GeminiSendMessageRepositoryImpl>(mock);
+    getIt.registerFactory<GeminiSendMessageCubit>(
+      () => GeminiSendMessageCubit(
+        repository: getIt<GeminiSendMessageRepository>(),
+      ),
+    );
+  });
+
+  group('Chat Screen Widgets Test Cases', () {
+    testWidgets(
+      'Case 1 :When the user sends a message, expect a loading bubble to appear.',
+      (tester) async {
+        when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+          await Future.delayed(const Duration(seconds: 2));
+          return getChatMessageModel();
+        });
+        await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+        await tester.pumpAndSettle();
+        var textField = find.byKey(const Key("custom_text_field"));
+        await tester.enterText(textField, 'Hello');
+        await tester.pumpAndSettle();
+        var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+        await tester.tap(iconButton);
+        await tester
+            .pump(); // to get one frame to show the loading bubble and then disappear but pumpAndSettle generate frames after each other
+        expect(AiLoadingMessageBubble(), findsOneWidget);
+        await tester
+            .pumpAndSettle(); // wait for the loading bubble to disappear because the previous is animation.
+      },
+    );
   });
 }

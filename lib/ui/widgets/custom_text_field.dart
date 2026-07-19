@@ -35,6 +35,7 @@ class CustomTextField extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: TextField(
+        key : const Key("custom_text_field"),
         controller: controller,
         enabled: enabled,
         minLines: minLines,
