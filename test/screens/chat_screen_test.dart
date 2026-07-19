@@ -20,6 +20,7 @@ import 'package:ai_chat_app/di/service_locator.dart';
 import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/ui/screens/chat_screen.dart';
 import 'package:ai_chat_app/ui/widgets/ai_loading_message_bubble.dart';
+import 'package:ai_chat_app/ui/widgets/ai_message_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -36,7 +37,7 @@ void main() {
     mock = GeminiSendMessageRepositoryImplMock();
     await getIt
         .reset(); // To ensure that the service locator is reset before each test and generate a new instance of the cubit with the mock repository.
-    getIt.registerSingleton<GeminiSendMessageRepositoryImpl>(mock);
+    getIt.registerSingleton<GeminiSendMessageRepository>(mock);
     getIt.registerFactory<GeminiSendMessageCubit>(
       () => GeminiSendMessageCubit(
         repository: getIt<GeminiSendMessageRepository>(),
@@ -61,9 +62,27 @@ void main() {
         await tester.tap(iconButton);
         await tester
             .pump(); // to get one frame to show the loading bubble and then disappear but pumpAndSettle generate frames after each other
-        expect(AiLoadingMessageBubble(), findsOneWidget);
+        expect(find.byType(AiLoadingMessageBubble), findsOneWidget);
         await tester
             .pumpAndSettle(); // wait for the loading bubble to disappear because the previous is animation.
+      },
+    );
+    testWidgets(
+      'Case 2 : When the user sends a message and the request succeeds, expect a success bubble to appear.',
+      (tester) async {
+        when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+          await Future.delayed(const Duration(seconds: 2));
+          return getChatMessageModel();
+        });
+        await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+        await tester.pumpAndSettle();
+        var textField = find.byKey(const Key("custom_text_field"));
+        await tester.enterText(textField, 'Hello');
+        await tester.pumpAndSettle();
+        var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+        await tester.tap(iconButton);
+        await tester.pumpAndSettle();
+        expect(find.byType(AiMessageBubble), findsOneWidget);
       },
     );
   });
