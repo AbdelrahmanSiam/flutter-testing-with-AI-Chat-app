@@ -7,10 +7,9 @@ Test cases:
 case 1 : When the user sends a message, expect a loading bubble to appear.
 case 2 : When the user sends a message and the request succeeds, expect a success bubble to appear.
 case 3 : When the user sends a message and the request fails, expect a failure bubble to appear.
-case 4 : When a failure bubble is shown and the user taps retry, expect a loading bubble to appear and then either:
-a success bubble if the retry succeeds, or
-a failure bubble if the retry fails.
-case 5 : When a failure bubble is shown and the user sends another message, expect the new message to be accepted and processed.
+case 4 : When a failure bubble is shown and the user taps retry, expect a loading bubble to appear and then a success bubble if the retry succeeds.
+case 5 : When a failure bubble is shown and the user taps retry, expect a loading bubble to appear and then a failure bubble if the retry fails.
+case 6 : When a failure bubble is shown and the user sends another message, expect the new message to be accepted and processed.
 When a loading bubble is visible, expect the user to be unable to send another message.
  */
 import 'package:ai_chat_app/cubit/gemini_send_message/gemini_send_message_cubit.dart';
@@ -21,6 +20,7 @@ import 'package:ai_chat_app/models/chat_message_model.dart';
 import 'package:ai_chat_app/ui/screens/chat_screen.dart';
 import 'package:ai_chat_app/ui/widgets/ai_loading_message_bubble.dart';
 import 'package:ai_chat_app/ui/widgets/ai_message_bubble.dart';
+import 'package:ai_chat_app/ui/widgets/failure_message_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -86,4 +86,22 @@ void main() {
       },
     );
   });
+  testWidgets(
+      'case 3 : When the user sends a message and the request fails, expect a failure bubble to appear.',
+      (tester) async {
+        when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+          await Future.delayed(const Duration(seconds: 2));
+          throw Exception('Failed to send message');
+        });
+        await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+        await tester.pumpAndSettle();
+        var textField = find.byKey(const Key("custom_text_field"));
+        await tester.enterText(textField, 'Hello');
+        await tester.pumpAndSettle();
+        var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+        await tester.tap(iconButton);
+        await tester.pumpAndSettle();
+        expect(find.byType(FailureMessageBubble), findsOneWidget);
+      },
+    );
 }
