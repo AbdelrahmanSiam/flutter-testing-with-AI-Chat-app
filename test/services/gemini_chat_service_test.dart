@@ -174,7 +174,6 @@ void main() {
         );
       },
     );
-
     test(
       "Test Api Request fails at 3 attempt and throw non retryable exception",
       () async {
