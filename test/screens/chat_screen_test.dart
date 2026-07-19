@@ -87,7 +87,7 @@ void main() {
     );
   });
   testWidgets(
-      'case 3 : When the user sends a message and the request fails, expect a failure bubble to appear.',
+      'case 3 : When the user sends a message and the request fails, expect a failure bubble to appear and contains use message.',
       (tester) async {
         when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
           await Future.delayed(const Duration(seconds: 2));
@@ -101,7 +101,7 @@ void main() {
         var iconButton = find.byIcon(Icons.arrow_upward_rounded);
         await tester.tap(iconButton);
         await tester.pumpAndSettle();
-        expect(find.byType(FailureMessageBubble), findsOneWidget);
+        expect(find.descendant(of: find.byType(FailureMessageBubble), matching: find.text('Hello')), findsOneWidget);
       },
     );
 }
