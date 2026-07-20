@@ -60,7 +60,11 @@ void main() {
   );
   group("Test Retry Logic", () {
     setUpAll(() async {
-      await dotenv.load(fileName: '.env');
+      try {
+        await dotenv.load(fileName: '.env');
+      } catch (_) {
+        // Ignore missing dotenv initialization in tests; the service should still be testable.
+      }
     });
     test("Test Api Request success from first attempt", () async {
       // Arrange

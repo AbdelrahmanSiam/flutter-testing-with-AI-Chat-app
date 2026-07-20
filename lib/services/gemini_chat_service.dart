@@ -6,13 +6,29 @@ import 'client_api.dart';
 /// Service for interacting with Google Gemini API.
 class GeminiChatService {
   final ClientApi _api;
-  final String _apiKey = dotenv.env["API_KEY"]!;
 
   GeminiChatService({
     required ClientApi api,
     String modelId = 'gemini-3-flash-preview',
   }) : _api = api;
-  final url = dotenv.env["API_URL"]!;
+
+  Future<void> _ensureEnvLoaded() async {
+    try {
+      await dotenv.load(fileName: '.env');
+    } catch (_) {
+      // Ignore if the file is already loaded or unavailable.
+    }
+  }
+
+  Future<String> get _apiKey async {
+    await _ensureEnvLoaded();
+    return dotenv.env['API_KEY'] ?? '';
+  }
+
+  Future<String> get url async {
+    await _ensureEnvLoaded();
+    return dotenv.env['API_URL'] ?? '';
+  }
 
   late DioException exception;
   Future<ChatMessageModel> sendMessage(List<ChatMessageModel> messages) async {
@@ -28,10 +44,10 @@ class GeminiChatService {
     for (int i = 0; i < 3; i++) {
       try {
         final response = await _api.post<Map<String, dynamic>>(
-          url,
+          await url,
           data: {'contents': requestContents},
           headers: {
-            'x-goog-api-key': _apiKey,
+            'x-goog-api-key': await _apiKey,
             'Content-Type': 'application/json',
           },
         );

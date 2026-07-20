@@ -16,13 +16,19 @@ import '../widgets/chat_bot_app_bar.dart';
 import '../widgets/chat_bot_app_bar_action.dart';
 import '../widgets/chat_input_bar.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final List<ChatMessageModel> messages = [];
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final List<ChatMessageModel> messages = [];
 
     return BlocProvider(
       create: (context) => getIt<GeminiSendMessageCubit>(),
@@ -46,36 +52,34 @@ class ChatScreen extends StatelessWidget {
         body: Column(
           children: [
             Expanded(
-              child:
-                  BlocConsumer<GeminiSendMessageCubit, GeminiSendMessageState>(
-                    listener: (context, state) {
-                      if (state is GeminiSendMessageSuccess) {
-                        // Add AI response
-                        messages.add(
-                          ChatMessageModel.model(
-                            state.message.content.parts.first.text,
-                          ),
+              child: BlocConsumer<GeminiSendMessageCubit, GeminiSendMessageState>(
+                listener: (context, state) {
+                  if (state is GeminiSendMessageSuccess) {
+                    messages.add(
+                      ChatMessageModel.model(
+                        state.message.content.parts.first.text,
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is GeminiSendMessageLoading) {
+                    return LoadingChatMessagesList(messages: messages);
+                  }
+                  if (state is GeminiSendMessageFailure) {
+                    return FailureChatMessagesList(
+                      messages: messages,
+                      errorMessage: state.error,
+                      onRetry: () {
+                        context.read<GeminiSendMessageCubit>().sendMessage(
+                          messages,
                         );
-                      }
-                    },
-                    builder: (context, state) {
-                      if (state is GeminiSendMessageLoading) {
-                        return LoadingChatMessagesList(messages: messages);
-                      }
-                      if (state is GeminiSendMessageFailure) {
-                        return FailureChatMessagesList(
-                          messages: messages,
-                          errorMessage: state.error,
-                          onRetry: () {
-                            context.read<GeminiSendMessageCubit>().sendMessage(
-                              messages,
-                            );
-                          },
-                        );
-                      }
-                      return ChatMessagesList(now: now, messages: messages);
-                    },
-                  ),
+                      },
+                    );
+                  }
+                  return ChatMessagesList(now: now, messages: messages);
+                },
+              ),
             ),
             ChatInputBar(messages: messages),
           ],

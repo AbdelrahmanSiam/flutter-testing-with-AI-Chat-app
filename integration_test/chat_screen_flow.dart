@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/common.dart' hide Response;
+import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class ClientApiMock extends Mock implements ClientApi {}
@@ -18,6 +19,7 @@ ChatMessageModel getChatMessageModel() =>
     ChatMessageModel.model('Hello, how can I assist you today?');
 
 void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   late ClientApiMock mock;
   setUp(() async {
     mock = ClientApiMock();
@@ -70,7 +72,10 @@ void main() {
             queryParameters: any(named: "queryParameters"),
             headers: any(named: "headers"),
           ),
-        ).thenAnswer((_) async => successResponse);
+        ).thenAnswer((_) async {
+          await Future.delayed(const Duration(milliseconds: 300));
+          return successResponse;
+        });
         await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
         await tester.pumpAndSettle();
         var textField = find.byKey(const Key("custom_text_field"));

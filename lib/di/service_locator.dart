@@ -11,11 +11,11 @@ void setupServiceLocator() {
   getIt.registerSingleton<ClientApi>(
     ClientApi(baseUrl: 'https://generativelanguage.googleapis.com', dio: Dio()),
   );
-  getIt.registerSingleton<GeminiChatService>(
-    GeminiChatService(api: getIt<ClientApi>()),
+  getIt.registerLazySingleton<GeminiChatService>(
+   ()=> GeminiChatService(api: getIt<ClientApi>()),
   );
-  getIt.registerSingleton<GeminiSendMessageRepository>(
-    GeminiSendMessageRepositoryImpl(service: getIt<GeminiChatService>()),
+  getIt.registerLazySingleton<GeminiSendMessageRepository>(
+   ()=> GeminiSendMessageRepositoryImpl(service: getIt<GeminiChatService>()),
   );
   getIt.registerFactory<GeminiSendMessageCubit>(
     () => GeminiSendMessageCubit(repository: getIt<GeminiSendMessageRepository>()),
