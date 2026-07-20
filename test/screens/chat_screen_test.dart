@@ -110,7 +110,7 @@ void main() {
   });
 
   testWidgets(
-    'case 4 : Success Retry => When a failure bubble is shown and the user taps retry, expect failure bubble to disappear and replaced with user bubble and then loading bubble to appear and then AI success bubble.',
+    'case 4 : Success Retry => When a failure bubble is shown and the user taps retry, expect failure bubble to disappear and replaced with user bubble and then AI success bubble.',
     (tester) async {
       var counter = 0;
       when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
@@ -142,6 +142,39 @@ void main() {
       expect(find.byType(UserMessageBubble), findsOneWidget);
       expect(find.byType(AiMessageBubble), findsOneWidget);
       expect(find.byType(FailureMessageBubble), findsNothing);
+    },
+  );
+
+    testWidgets(
+    'case 5 : Failure Retry => When a failure bubble is shown and the user taps retry, expect failure bubble to disappear and replaced with another failure bubble.',
+    (tester) async {
+      for(int i =0 ; i < 2 ; i++){
+         when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+        await Future.delayed(const Duration(seconds: 2));
+          throw Exception('Failed to send message');
+      });
+      }
+      await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+      await tester.pumpAndSettle();
+      var textField = find.byKey(const Key("custom_text_field"));
+      await tester.enterText(textField, 'Hello');
+      await tester.pumpAndSettle();
+      var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+      await tester.tap(iconButton);
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byType(FailureMessageBubble),
+          matching: find.text('Hello'),
+        ),
+        findsOneWidget,
+      );
+      var retryButton = find.byIcon(Icons.refresh);
+      await tester.tap(retryButton);
+      await tester.pumpAndSettle();
+      expect(find.byType(UserMessageBubble), findsNothing);
+      expect(find.byType(AiMessageBubble), findsNothing);
+      expect(find.byType(FailureMessageBubble), findsOneWidget);
     },
   );
 }
