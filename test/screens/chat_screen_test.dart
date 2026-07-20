@@ -21,6 +21,7 @@ import 'package:ai_chat_app/ui/screens/chat_screen.dart';
 import 'package:ai_chat_app/ui/widgets/ai_loading_message_bubble.dart';
 import 'package:ai_chat_app/ui/widgets/ai_message_bubble.dart';
 import 'package:ai_chat_app/ui/widgets/failure_message_bubble.dart';
+import 'package:ai_chat_app/ui/widgets/user_message_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -86,53 +87,61 @@ void main() {
       },
     );
   });
-  testWidgets(
-      'case 3 : Failure Bubble .',
-      (tester) async {
-        when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
-          await Future.delayed(const Duration(seconds: 2));
-          throw Exception('Failed to send message');
-        });
-        await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
-        await tester.pumpAndSettle();
-        var textField = find.byKey(const Key("custom_text_field"));
-        await tester.enterText(textField, 'Hello');
-        await tester.pumpAndSettle();
-        var iconButton = find.byIcon(Icons.arrow_upward_rounded);
-        await tester.tap(iconButton);
-        await tester.pumpAndSettle();
-        expect(find.descendant(of: find.byType(FailureMessageBubble), matching: find.text('Hello')), findsOneWidget);
-      },
+  testWidgets('case 3 : Failure Bubble .', (tester) async {
+    when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+      throw Exception('Failed to send message');
+    });
+    await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+    await tester.pumpAndSettle();
+    var textField = find.byKey(const Key("custom_text_field"));
+    await tester.enterText(textField, 'Hello');
+    await tester.pumpAndSettle();
+    var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+    await tester.tap(iconButton);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(FailureMessageBubble),
+        matching: find.text('Hello'),
+      ),
+      findsOneWidget,
     );
-    
-    testWidgets(
-      'case 4 : Success Retry => When a failure bubble is shown and the user taps retry, expect failure bubble to disappear and replaced with user bubble and then loading bubble to appear and then AI success bubble.',
-      (tester) async {
-        var counter = 0;
-        when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
-          counter++;
-          await Future.delayed(const Duration(seconds: 2));
-          if(counter ==1){
-            throw Exception('Failed to send message');
-          }
-          return getChatMessageModel();
+  });
 
-        });
-        await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
-        await tester.pumpAndSettle();
-        var textField = find.byKey(const Key("custom_text_field"));
-        await tester.enterText(textField, 'Hello');
-        await tester.pumpAndSettle();
-        var iconButton = find.byIcon(Icons.arrow_upward_rounded);
-        await tester.tap(iconButton);
-        await tester.pumpAndSettle();
-       expect(find.descendant(of: find.byType(FailureMessageBubble), matching: find.text('Hello')), findsOneWidget) ;
-        var retryButton = find.byIcon(Icons.refresh);
-        await tester.tap(retryButton);
-        await tester.pump(); // wait to see loading bubble
-        expect(find.byType(AiLoadingMessageBubble), findsOneWidget);
-        await tester.pumpAndSettle();
-        expect(find.byType(AiMessageBubble), findsOneWidget);
-      },
-    );
+  testWidgets(
+    'case 4 : Success Retry => When a failure bubble is shown and the user taps retry, expect failure bubble to disappear and replaced with user bubble and then loading bubble to appear and then AI success bubble.',
+    (tester) async {
+      var counter = 0;
+      when(() => mock.geminiSendMessage(any())).thenAnswer((_) async {
+        counter++;
+        await Future.delayed(const Duration(seconds: 2));
+        if (counter == 1) {
+          throw Exception('Failed to send message');
+        }
+        return getChatMessageModel();
+      });
+      await tester.pumpWidget(MaterialApp(home: const ChatScreen()));
+      await tester.pumpAndSettle();
+      var textField = find.byKey(const Key("custom_text_field"));
+      await tester.enterText(textField, 'Hello');
+      await tester.pumpAndSettle();
+      var iconButton = find.byIcon(Icons.arrow_upward_rounded);
+      await tester.tap(iconButton);
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byType(FailureMessageBubble),
+          matching: find.text('Hello'),
+        ),
+        findsOneWidget,
+      );
+      var retryButton = find.byIcon(Icons.refresh);
+      await tester.tap(retryButton);
+      await tester.pumpAndSettle();
+      expect(find.byType(UserMessageBubble), findsOneWidget);
+      expect(find.byType(AiMessageBubble), findsOneWidget);
+      expect(find.byType(FailureMessageBubble), findsNothing);
+    },
+  );
 }
