@@ -45,6 +45,9 @@ void main() {
       ),
     );
   });
+  tearDown(() async {
+    await getIt.reset(); // cleanup بعد كل test
+  });
 
   group('Chat Screen Widgets Test Cases', () {
     testWidgets(
